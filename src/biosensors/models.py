@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import date
+from math import isfinite
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,8 +20,8 @@ class BiosensorPassport:
             raise ValueError("Identifier must not be empty")
         if not self.material.strip():
             raise ValueError("Material must not be empty")
-        if self.resistance_ohm <= 0:
-            raise ValueError("Resistance must be positive")
+        if not isfinite(self.resistance_ohm) or self.resistance_ohm <= 0:
+            raise ValueError("Resistance must be finite and positive")
         date.fromisoformat(self.created_at)
 
     def to_dict(self) -> dict[str, str | float]:
