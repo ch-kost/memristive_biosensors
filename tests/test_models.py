@@ -22,6 +22,22 @@ class BiosensorPassportTests(unittest.TestCase):
         passport = BiosensorPassport("BS-004", "TiO2", 500, "2026-10-30")
         self.assertEqual(BiosensorPassport.from_dict(passport.to_dict()), passport)
 
+    def test_non_finite_resistance_is_rejected(self) -> None:
+        for resistance in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(resistance=resistance), self.assertRaises(ValueError):
+                BiosensorPassport("BS-005", "TiO2", resistance, "2026-10-30")
+
+    def test_non_finite_resistance_from_json_is_rejected(self) -> None:
+        for resistance in ("NaN", "Infinity", "-Infinity"):
+            data = {
+                "identifier": "BS-006",
+                "material": "TiO2",
+                "resistance_ohm": resistance,
+                "created_at": "2026-10-30",
+            }
+            with self.subTest(resistance=resistance), self.assertRaises(ValueError):
+                BiosensorPassport.from_dict(data)
+
 
 if __name__ == "__main__":
     unittest.main()
